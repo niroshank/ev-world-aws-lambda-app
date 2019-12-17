@@ -6,7 +6,7 @@ Description: CD Demo Lambda
 Resources:
     #Defining the lambda function
     CDDemoLambda:
-        Type: AWS::Serverless::Function
+        Type: 'AWS::Serverless::Function'
         Properties:
             Handler: lambdaFunction.lambda_handler
             Runtime: python2.7.17
