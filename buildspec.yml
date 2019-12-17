@@ -2,7 +2,7 @@ version: 0.2
 phases:
   install:
     runtime-versions:
-        python: 2.7.17
+        python: 3.8
   build:
     commands:
       - python --version
