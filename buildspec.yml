@@ -1,10 +1,11 @@
 version: 0.1
 phases:
   install:
-    # runtime-versions:
-    #     nodejs: 10
-#   build:
+    runtime-versions:
+        python: 2.7.17
+  build:
     commands:
+      - python --version
       - aws cloudformation package --template-file template.yml --s3-bucket ev-world-aws-lambda-bucket --output-template-file outputtemplate.yml
 artifacts:
   type: zip
