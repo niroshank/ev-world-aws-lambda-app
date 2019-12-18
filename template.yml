@@ -9,7 +9,7 @@ Resources:
         Type: AWS::Serverless::Function
         Properties:
             Handler: lambdaFunction.lambda_handler
-            Runtime: python3.7
+            Runtime: python3.8
             CodeUri: ./services
             Description: 'Lambda function for CD Demo'
             MemorySize: 128
