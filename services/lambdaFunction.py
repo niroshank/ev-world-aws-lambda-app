@@ -6,7 +6,7 @@ from boto3.dynamodb.conditions import Key, Attr
 dynamodb = boto3.resource('dynamodb')
 table = dynamodb.Table('EvWorldCar')
 
-def handler(event, context):    
+def lambda_handler(event, context):    
     print("Joe's music")
     print(table.creation_date_time)
 
@@ -16,3 +16,4 @@ response = table.query(
 
 for i in response['Items']:
     print(i['id'], ":", i['id'])
+
