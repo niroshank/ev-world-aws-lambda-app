@@ -4,15 +4,15 @@ import boto3
 from boto3.dynamodb.conditions import Key, Attr
 
 dynamodb = boto3.resource('dynamodb')
-table = dynamodb.Table('Music')
+table = dynamodb.Table('EvWorldCar')
 
 def handler(event, context):    
     print("Joe's music")
     print(table.creation_date_time)
 
 response = table.query(
-    KeyConditionExpression=Key('Artist').eq('Joe')
+    KeyConditionExpression=Key('id').eq(1)
 )
 
 for i in response['Items']:
-    print(i['Artist'], ":", i['Artist'])
+    print(i['id'], ":", i['id'])

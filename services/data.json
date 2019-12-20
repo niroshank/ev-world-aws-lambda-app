@@ -1,0 +1,19 @@
+{
+  "id": 1,
+  "payload": {
+    "make": "Toyota",
+    "model": "Camry",
+    "year": 2018,
+    "price": "$18,000",
+    "options": {
+      "color": "Pure White",
+      "body_type": "Sedan",
+      "doors": 4,
+      "riding_capacity": 5,
+      "top_speed": 171,
+      "cooling_system": "Air"
+    },
+    "created_date": "2019-01-18T00:00:00Z",
+    "updated_date": "2019-01-18T00:00:00Z"
+  }
+}
