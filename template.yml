@@ -26,7 +26,7 @@ Resources:
                     REGION: ap-southeast-1
     
     #search model lambda function
-    CarModelSearchLambda:
+    ModelSearchLambda:
         Type: AWS::Serverless::Function
         Properties:
             Handler: car-model-search.lambda_handler
@@ -47,7 +47,7 @@ Resources:
                     REGION: ap-southeast-1
     
     #retrieve price lambda function
-    CarPriceRetrievalLambda:
+    PriceRetrievalLambda:
         Type: AWS::Serverless::Function
         Properties:
             Handler: car-price-retrieval.lambda_handler
@@ -68,7 +68,7 @@ Resources:
                     REGION: ap-southeast-1                
 
     #retrieve options lambda function
-    CarPriceRetrievalLambda:
+    OptionsRetrievalLambda:
         Type: AWS::Serverless::Function
         Properties:
             Handler: car-option-retrieval.lambda_handler
