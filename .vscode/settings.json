@@ -1,3 +1,5 @@
 {
-    "python.pythonPath": ".venv\\Scripts\\python.exe"
+    "python.pythonPath": "D:/CC/ev-world-aws-lambda-app/.venv/Scripts/python.exe",
+    "python.linting.pylintEnabled": true,
+    "python.linting.enabled": true
 }

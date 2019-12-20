@@ -37,7 +37,7 @@ deactivate () {
 # unset irrelevant variables
 deactivate nondestructive
 
-VIRTUAL_ENV="D:\CC\App\aws-app\ev-world-aws-lambda-app\.venv"
+VIRTUAL_ENV="D:\CC\ev-world-aws-lambda-app\.venv"
 export VIRTUAL_ENV
 
 _OLD_VIRTUAL_PATH="$PATH"

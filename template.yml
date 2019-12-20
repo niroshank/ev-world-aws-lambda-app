@@ -4,7 +4,7 @@ AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
 Description: CD Demo Lambda
 Resources:
-    #Defining the lambda function
+    #Defining the lambda function for testing
     CDDemoLambda:
         Type: AWS::Serverless::Function
         Properties:
@@ -24,5 +24,66 @@ Resources:
             Environment:
                 Variables:
                     REGION: ap-southeast-1
+    
+    #search model lambda function
+    CarModelSearchLambda:
+        Type: AWS::Serverless::Function
+        Properties:
+            Handler: car-model-search.lambda_handler
+            Runtime: python3.8
+            CodeUri: ./services
+            Description: 'Lambda function for car model search'
+            MemorySize: 128
+            Timeout: 30
+            Role: arn:aws:iam::322967638274:role/custom-lambda-role
+            Events:
+                scanCarModelAPI:
+                    Type: Api
+                    Properties:
+                        Path: /car-model-search
+                        Method: post
+            Environment:
+                Variables:
+                    REGION: ap-southeast-1
+    
+    #retrieve price lambda function
+    CarPriceRetrievalLambda:
+        Type: AWS::Serverless::Function
+        Properties:
+            Handler: car-price-retrieval.lambda_handler
+            Runtime: python3.8
+            CodeUri: ./services
+            Description: 'Lambda function for car price retrieve'
+            MemorySize: 128
+            Timeout: 30
+            Role: arn:aws:iam::322967638274:role/custom-lambda-role
+            Events:
+                getCarPriceAPI:
+                    Type: Api
+                    Properties:
+                        Path: /car-price
+                        Method: post
+            Environment:
+                Variables:
+                    REGION: ap-southeast-1                
 
-#this will convert to cloudFormation template
+    #retrieve options lambda function
+    CarPriceRetrievalLambda:
+        Type: AWS::Serverless::Function
+        Properties:
+            Handler: car-option-retrieval.lambda_handler
+            Runtime: python3.8
+            CodeUri: ./services
+            Description: 'Lambda function for car options retrieve'
+            MemorySize: 128
+            Timeout: 30
+            Role: arn:aws:iam::322967638274:role/custom-lambda-role
+            Events:
+                getCarOptionsAPI:
+                    Type: Api
+                    Properties:
+                        Path: /car-options
+                        Method: post
+            Environment:
+                Variables:
+                    REGION: ap-southeast-1
