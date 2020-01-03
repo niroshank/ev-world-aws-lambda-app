@@ -1,29 +1,40 @@
 #SAM Template - defines the application
 #AWS SAM is a model used to define serverless applications on AWS
 AWSTemplateFormatVersion: '2010-09-09'
-Transform: AWS::Serverless-2016-10-31
-Description: CD Demo Lambda
+Transform:
+- 'AWS::Serverless-2016-10-31'
+- 'AWS::EvWorld'
+
+Description:
+  Creates a RESTful API using API Gateway, Lambda and DynamoDB for the ev world development team
+
+Parameters:
+  ProjectId:
+    Type: String
+    Description: AWS EV WORLD PROJECT
+Stage:
+    Type: String
+    Description: The name for a project pipeline stage, such as Staging or Prod, for which resources are provisioned and deployed.
+    Default: Dev    
 
 Resources:
      #Defining a role for lambda functions
-    # EvWorldLambdaFunctionRole:
-    #     Type: AWS:IAM:Role
-    #     Properties:
-    #         ManagedPolicyArns:
-    #             # arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole 
-    #             # arn:aws:iam::aws:policy/AWSLambdaDynamoDBExecutionRole
-    #         AssumeRolePolicyDocument:
-    #         Version: "2012-10-17"
-    #         Statement:
-    #           -
-    #             Sid: AllowLambdaServiceToAssumeRole
-    #             Effect: "Allow"
-    #             Action: 
-    #               - "sts:AssumeRole"
-    #             Principal:
-    #               Service: 
-    #                 - "lambda.amazonaws.com"
-    #Defining the lambda function for testing
+    LambdaExecutionRole:
+        Description: Creating service role in IAM for AWS Lambda
+        Type: AWS::IAM::Role
+        Properties:
+            RoleName: !Sub 'EvWorld-${ProjectId}-Execution${Stage}'
+            AssumeRolePolicyDocument:
+                Statement:
+                - Effect: Allow
+                  Principal:
+                    Service: [lambda.amazonaws.com]
+                  Action: sts:AssumeRole
+            Path: /
+            ManagedPolicyArns:
+                -  arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+                -  arn:aws:iam::aws:policy/AmazonDynamoDBFullAccess
+            PermissionsBoundary: !Sub 'arn:${AWS::Partition}:iam::${AWS::AccountId}:policy/CodeStar_${ProjectId}_PermissionsBoundary'
 
     #Defining the lambda function for testing
     CDDemoLambda:
@@ -35,7 +46,7 @@ Resources:
             Description: 'Lambda function for CD Demo'
             MemorySize: 128
             Timeout: 30
-            Role: arn:aws:iam::322967638274:role/custom-lambda-role
+            Role: !GetAtt LambdaExecutionRole.Arn
             Events:
                 getAZsAPI:
                     Type: Api
@@ -56,7 +67,7 @@ Resources:
             Description: 'Lambda function for car model search'
             MemorySize: 128
             Timeout: 30
-            Role: arn:aws:iam::322967638274:role/custom-lambda-role
+            Role: !GetAtt LambdaExecutionRole.Arn
             Events:
                 scanCarModelAPI:
                     Type: Api
@@ -77,7 +88,7 @@ Resources:
             Description: 'Lambda function for car price retrieve'
             MemorySize: 128
             Timeout: 30
-            Role: arn:aws:iam::322967638274:role/custom-lambda-role
+            Role: !GetAtt LambdaExecutionRole.Arn
             Events:
                 getCarPriceAPI:
                     Type: Api
@@ -98,7 +109,7 @@ Resources:
             Description: 'Lambda function for car options retrieve'
             MemorySize: 128
             Timeout: 30
-            Role: arn:aws:iam::322967638274:role/custom-lambda-role
+            Role: !GetAtt LambdaExecutionRole.Arn
             Events:
                 getCarOptionsAPI:
                     Type: Api
