@@ -3,7 +3,28 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
 Description: CD Demo Lambda
+
 Resources:
+     #Defining a role for lambda functions
+    # EvWorldLambdaFunctionRole:
+    #     Type: AWS:IAM:Role
+    #     Properties:
+    #         ManagedPolicyArns:
+    #             # arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole 
+    #             # arn:aws:iam::aws:policy/AWSLambdaDynamoDBExecutionRole
+    #         AssumeRolePolicyDocument:
+    #         Version: "2012-10-17"
+    #         Statement:
+    #           -
+    #             Sid: AllowLambdaServiceToAssumeRole
+    #             Effect: "Allow"
+    #             Action: 
+    #               - "sts:AssumeRole"
+    #             Principal:
+    #               Service: 
+    #                 - "lambda.amazonaws.com"
+    #Defining the lambda function for testing
+
     #Defining the lambda function for testing
     CDDemoLambda:
         Type: AWS::Serverless::Function
@@ -20,7 +41,7 @@ Resources:
                     Type: Api
                     Properties:
                         Path: /getazs
-                        Method: post
+                        Method: get
             Environment:
                 Variables:
                     REGION: ap-southeast-1
