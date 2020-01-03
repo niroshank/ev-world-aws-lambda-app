@@ -1,9 +1,7 @@
 #SAM Template - defines the application
 #AWS SAM is a model used to define serverless applications on AWS
 AWSTemplateFormatVersion: '2010-09-09'
-Transform:
-- 'AWS::Serverless-2016-10-31'
-- 'AWS::EvWorld'
+Transform: AWS::Serverless-2016-10-31
 
 Description:
   Creates a RESTful API using API Gateway, Lambda and DynamoDB for the ev world development team
