@@ -8,15 +8,6 @@ Transform:
 Description:
   Creates a RESTful API using API Gateway, Lambda and DynamoDB for the ev world development team
 
-Parameters:
-  ProjectId:
-    Type: String
-    Description: AWS EV WORLD PROJECT
-Stage:
-    Type: String
-    Description: The name for a project pipeline stage, such as Staging or Prod, for which resources are provisioned and deployed.
-    Default: Dev    
-
 Resources:
      #Defining a role for lambda functions
     LambdaExecutionRole:
