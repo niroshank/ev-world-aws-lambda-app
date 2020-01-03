@@ -23,7 +23,6 @@ Resources:
         Description: Creating service role in IAM for AWS Lambda
         Type: AWS::IAM::Role
         Properties:
-            RoleName: !Sub 'EvWorld-${ProjectId}-Execution${Stage}'
             AssumeRolePolicyDocument:
                 Statement:
                 - Effect: Allow
@@ -34,7 +33,6 @@ Resources:
             ManagedPolicyArns:
                 -  arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
                 -  arn:aws:iam::aws:policy/AmazonDynamoDBFullAccess
-            PermissionsBoundary: !Sub 'arn:${AWS::Partition}:iam::${AWS::AccountId}:policy/CodeStar_${ProjectId}_PermissionsBoundary'
 
     #Defining the lambda function for testing
     CDDemoLambda:
