@@ -203,30 +203,6 @@ Resources:
       GroupName: "no-ingress-sg"
       GroupDescription: "Security group with no ingress rule"
       VpcId: !Ref VPC
-
-  LambdaFunction:
-    Type: AWS::Serverless::Function
-    Properties:
-      Handler: car-price-retrieval.lambda_handler
-      Runtime: python3.8
-      CodeUri: ./services
-      Environment:
-        Variables:
-          REGION: ap-southeast-1
-      Events:
-        postUrl:
-          Type: Api
-          Properties:
-            Method: post
-            Path: /car-model-search
-      Policies:
-        - AWSLambdaVPCAccessExecutionRole
-      Timeout: 10
-      VpcConfig:
-        SecurityGroupIds: 
-          - !GetAtt NoIngressSecurityGroup.GroupId
-        SubnetIds:
-          - !Ref PrivateSubnet2
                               
   DynamoDBEndpoint:
     Type: AWS::EC2::VPCEndpoint
@@ -244,6 +220,46 @@ Resources:
       ServiceName: !Join [ "", [ "com.amazonaws.", { "Ref": "AWS::Region" }, ".dynamodb" ] ]
       VpcId: !Ref 'VPC'
 
+     #Defining a role for lambda functions
+    LambdaExecutionRole:
+        Description: Creating service role in IAM for AWS Lambda
+        Type: AWS::IAM::Role
+        Properties:
+            AssumeRolePolicyDocument:
+                Statement:
+                - Effect: Allow
+                  Principal:
+                    Service: [lambda.amazonaws.com]
+                  Action: sts:AssumeRole
+            Path: /
+            ManagedPolicyArns:
+                -  arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+                -  arn:aws:iam::aws:policy/AmazonDynamoDBFullAccess
+
+    CDDemoLambda:
+        Type: AWS::Serverless::Function
+        Properties:
+            Handler: car-price-retrieval.lambda_handler
+            Runtime: python3.8
+            CodeUri: ./services
+            Description: 'Lambda function for CD Demo'
+            MemorySize: 128
+            Timeout: 30
+            Role: !GetAtt LambdaExecutionRole.Arn
+            Events:
+                getAZsAPI:
+                    Type: Api
+                    Properties:
+                        Path: /getazs
+                        Method: get
+            Environment:
+                Variables:
+                    REGION: ap-southeast-1
+            VpcConfig:
+                SecurityGroupIds: 
+                    - !GetAtt NoIngressSecurityGroup.GroupId
+                SubnetIds:
+                    - !Ref PrivateSubnet2              
                 
 Outputs:
   VPC:
