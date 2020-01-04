@@ -35,7 +35,20 @@ Resources:
                 - !Ref getUrlSubnet
 
     getUrlTable:
-        Type: AWS::DynamoDB::SimpleTable
+        Type: AWS::DynamoDB::Table
+        Properties:
+            TableName: GetUrl-sample
+            AttributeDefinitions:
+                - 
+                   AttributeName: id
+                   AttributeType: S
+            KeySchema:
+                - 
+                   AttributeName: id
+                   KeyType: HASH
+            ProvisionedThroughput:
+                ReadCapacityUnits: 100
+                WriteCapacityUnits: 10
 
     getUrlCluster:
         Type: AWS::DAX::Cluster
