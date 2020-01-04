@@ -1,29 +1,23 @@
-import boto3
-import json
-import os
-from boto3.dynamodb.conditions import Key, Attr
-from decimal import Decimal
+from __future__ import print_function
 
-ddb = boto3.resource('dynamodb')
-table = ddb.Table('EvWorldCar')
+import os
+import amazondax
+import botocore.session
 
 def lambda_handler(event, context):
-    dataObject = json.loads(event['body'])
-    response = table.scan(
-      FilterExpression = Attr('payload.model').contains(dataObject["model"])
-      )
-    body = json.dumps(response['Items'], default=handle_decimal_type)
+    region = os.environ['REGION']
     
-    return {
-        'statusCode': 200,
-        'body': body
-    }
+    session = botocore.session.get_session()
+    #Store this at file level so that it is preserved between Lambda executions
+    
+    dynamodb = session.create_client('dynamodb', region_name=region) # low-level client
+    table_name = "GetUrl-sample"
+    
+    def lambda_handler(event, context):
+        try:
+            response = dynamodb.put_item(TableName=table_name, Item={'id':'1', 'N': 'string'})
+        except Exception, e:
+            print(e)
+        else:
+            print("GetItem succeeded:")
 
-def handle_decimal_type(obj):
-  if isinstance(obj, Decimal):
-      if float(obj).is_integer():
-         return int(obj)
-      else:
-         return float(obj)
-  raise TypeError
-  

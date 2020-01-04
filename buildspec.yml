@@ -6,6 +6,7 @@ phases:
   build:
     commands:
       - python --version
+      # - pip install amazon-dax-client
       - aws cloudformation package --template-file template.yml --s3-bucket ev-world-aws-lambda-bucket --output-template-file outputtemplate.yml
 artifacts:
   type: zip

@@ -45,6 +45,11 @@ Resources:
                 ReadCapacityUnits: 100
                 WriteCapacityUnits: 10
 
+    BasicSLR:
+        Type: AWS::IAM::ServiceLinkedRole
+        Properties:
+            AWSServiceName: dax.amazonaws.com
+            
     getUrlCluster:
         Type: AWS::DAX::Cluster
         Properties:
@@ -71,7 +76,7 @@ Resources:
                 Version: '2012-10-17'
             ManagedPolicyArns:
                 - arn:aws:iam::aws:policy/AmazonDynamoDBFullAccess
-                
+
             RoleName: getUrl-sample-Role
 
     getUrlSecurityGroup:
