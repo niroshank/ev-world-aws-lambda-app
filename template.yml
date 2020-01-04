@@ -71,6 +71,7 @@ Resources:
                 Version: '2012-10-17'
             ManagedPolicyArns:
                 - arn:aws:iam::aws:policy/AmazonDynamoDBFullAccess
+                
             RoleName: getUrl-sample-Role
 
     getUrlSecurityGroup:
