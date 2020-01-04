@@ -103,6 +103,7 @@ Resources:
               - Key: Name
                 Value: getUrl-sample
     
+    #configure subnet1
     getUrlSubnet:
         Type: AWS::EC2::Subnet
         Properties:
