@@ -207,28 +207,27 @@ Resources:
   SampleLambda:
     Type: AWS::Serverless::Function
     Properties:
-        Handler: car-option-retrieval.lambda_handler
-        Runtime: python3.8
-        CodeUri: ./services
-        Environment:
-            Variables:
-                REGION: ap-southeast-1
+      Handler: car-option-retrieval.lambda_handler
+      Runtime: python3.8
+      CodeUri: ./services
+      Environment:
+        Variables:
+          REGION: ap-southeast-1
         Events:
-            postUrl:
-                Type: Api
-                Properties:
-                    Method: post
-                    Path: /car-option-retrieval
+          postUrl:
+            Type: Api
+            Properties:
+              Method: post
+              Path: /car-option-retrieval
         Policies:
-            # - AmazonDynamoDBFullAccess
-            - AWSLambdaVPCAccessExecutionRole
+          - AWSLambdaVPCAccessExecutionRole
         Timeout: 10
         VpcConfig:
-            SecurityGroupIds: 
-                - !GetAtt NoIngressSecurityGroup.GroupId
-            SubnetIds:
-                - !Ref PrivateSubnet2
-                - !Ref PrivateSubnet1
+          SecurityGroupIds: 
+            - !GetAtt NoIngressSecurityGroup.GroupId
+          SubnetIds:
+            - !Ref PrivateSubnet2
+            - !Ref PrivateSubnet1
 
 #   getUrlTable:
 #     Type: AWS::DynamoDB::Table
