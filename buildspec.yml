@@ -7,6 +7,7 @@ phases:
     commands:
       - python --version
       - aws cloudformation package --template-file template.yml --s3-bucket ev-world-aws-lambda-bucket --output-template-file outputtemplate.yml
+      - aws iam create-service-linked-role --aws-service-name ecs.amazonaws.com
 artifacts:
   type: zip
   files:
