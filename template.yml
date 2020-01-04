@@ -44,12 +44,7 @@ Resources:
             ProvisionedThroughput:
                 ReadCapacityUnits: 100
                 WriteCapacityUnits: 10
-
-    BasicSLR:
-        Type: AWS::IAM::ServiceLinkedRole
-        Properties:
-            AWSServiceName: dax.amazonaws.com
-            
+   
     getUrlCluster:
         Type: AWS::DAX::Cluster
         Properties:
