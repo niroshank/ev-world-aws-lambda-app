@@ -204,30 +204,29 @@ Resources:
       GroupDescription: "Security group with no ingress rule"
       VpcId: !Ref VPC
 
-  SampleLambda:
-    Type: AWS::Serverless::Function
-    Properties:
-      Handler: car-option-retrieval.lambda_handler
-      Runtime: python3.8
-      CodeUri: ./services
-      Environment:
-        Variables:
-          REGION: ap-southeast-1
-        Events:
-          postUrl:
-            Type: Api
-            Properties:
-              Method: post
-              Path: /car-option-retrieval
-        Policies:
-          - AWSLambdaVPCAccessExecutionRole
-        Timeout: 10
-        VpcConfig:
-          SecurityGroupIds: 
-            - !GetAtt NoIngressSecurityGroup.GroupId
-          SubnetIds:
-            - !Ref PrivateSubnet2
-            - !Ref PrivateSubnet1
+    Lambda:
+        Type: AWS::Serverless::Function
+        Properties:
+            Handler: car-price-retrieval.lambda_handler
+            Runtime: python3.8
+            CodeUri: ./services
+            Environment:
+                Variables:
+                    REGION: ap-southeast-1
+            Events:
+                postUrl:
+                    Type: Api
+                    Properties:
+                        Method: post
+                        Path: /car-model-search
+            Policies:
+                - AWSLambdaVPCAccessExecutionRole
+            Timeout: 10
+            VpcConfig:
+                SecurityGroupIds: 
+                    - !GetAtt NoIngressSecurityGroup.GroupId
+                SubnetIds:
+                    - !Ref PrivateSubnet2
 
 #   getUrlTable:
 #     Type: AWS::DynamoDB::Table
