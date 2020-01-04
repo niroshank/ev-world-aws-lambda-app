@@ -13,6 +13,7 @@ Resources:
                 Variables:
                     DAX_ENDPOINT: !GetAtt getUrlCluster.ClusterDiscoveryEndpoint
                     DDB_TABLE: !Ref getUrlTable
+                    REGION: ap-southeast-1
             Events:
                 postUrl:
                     Type: Api
