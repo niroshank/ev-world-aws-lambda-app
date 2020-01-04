@@ -1,126 +1,295 @@
-AWSTemplateFormatVersion: '2010-09-09'
-Description: A sample application showing how to use Amazon DynamoDB Accelerator (DAX) with AWS Lambda and AWS CloudFormation.
-Transform: AWS::Serverless-2016-10-31
+Description:  This template deploys a VPC, with a pair of public and private subnets spread
+  across two Availability Zones. It deploys an internet gateway, with a default
+  route on the public subnets. It deploys a pair of NAT gateways (one in each AZ),
+  and default routes for them in the private subnets.
+
+Parameters:
+  EnvironmentName:
+    Description: An environment name that is prefixed to resource names
+    Type: String
+
+  VpcCIDR:
+    Description: Please enter the IP range (CIDR notation) for this VPC
+    Type: String
+    Default: 10.192.0.0/16
+
+  PublicSubnet1CIDR:
+    Description: Please enter the IP range (CIDR notation) for the public subnet in the first Availability Zone
+    Type: String
+    Default: 10.192.10.0/24
+
+  PublicSubnet2CIDR:
+    Description: Please enter the IP range (CIDR notation) for the public subnet in the second Availability Zone
+    Type: String
+    Default: 10.192.11.0/24
+
+  PrivateSubnet1CIDR:
+    Description: Please enter the IP range (CIDR notation) for the private subnet in the first Availability Zone
+    Type: String
+    Default: 10.192.20.0/24
+
+  PrivateSubnet2CIDR:
+    Description: Please enter the IP range (CIDR notation) for the private subnet in the second Availability Zone
+    Type: String
+    Default: 10.192.21.0/24
 
 Resources:
-    siteFunction:
-        Type: AWS::Serverless::Function
-        Properties:
-            Handler: car-model-search.lambda_handler
-            Runtime: python3.8
-            CodeUri: ./services
-            Environment:
-                Variables:
-                    DAX_ENDPOINT: !GetAtt getUrlCluster.ClusterDiscoveryEndpoint
-                    DDB_TABLE: !Ref getUrlTable
-                    REGION: ap-southeast-1
-            Events:
-                postUrl:
-                    Type: Api
-                    Properties:
-                        Method: post
-                        Path: /car-model-search
-            Policies:
-                - AmazonDynamoDBFullAccess
-                - AWSLambdaVPCAccessExecutionRole
-            Timeout: 10
-            VpcConfig:
-                SecurityGroupIds: 
-                    - !GetAtt getUrlSecurityGroup.GroupId
-                SubnetIds:
-                    - !Ref getUrlSubnet
+  VPC:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: !Ref VpcCIDR
+      EnableDnsSupport: true
+      EnableDnsHostnames: true
+      Tags:
+        - Key: Name
+          Value: !Ref EnvironmentName
 
-    getUrlTable:
-        Type: AWS::DynamoDB::Table
-        Properties:
-            TableName: GetUrl-sample
-            AttributeDefinitions:
-                - 
-                   AttributeName: id
-                   AttributeType: S
-            KeySchema:
-                - 
-                   AttributeName: id
-                   KeyType: HASH
-            ProvisionedThroughput:
-                ReadCapacityUnits: 100
-                WriteCapacityUnits: 10
-   
-    getUrlCluster:
-        Type: AWS::DAX::Cluster
-        Properties:
-            ClusterName: getUrl-sample
-            Description: Cluster for GetUrl Sample
-            IAMRoleARN: !GetAtt getUrlRole.Arn
-            NodeType: dax.t2.small
-            ReplicationFactor: 1
-            SecurityGroupIds:
-                - !GetAtt getUrlSecurityGroup.GroupId
-            SubnetGroupName: !Ref getUrlSubnetGroup
+  InternetGateway:
+    Type: AWS::EC2::InternetGateway
+    Properties:
+      Tags:
+        - Key: Name
+          Value: !Ref EnvironmentName
 
-    getUrlRole:
-        Type: AWS::IAM::Role
-        Properties:
-            AssumeRolePolicyDocument:
-                Statement:
-                    - Action:
-                      - sts:AssumeRole
-                      Effect: Allow
-                      Principal:
-                        Service:
-                        - dax.amazonaws.com
-                Version: '2012-10-17'
-            ManagedPolicyArns:
-                - arn:aws:iam::aws:policy/AmazonDynamoDBFullAccess
+  InternetGatewayAttachment:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties:
+      InternetGatewayId: !Ref InternetGateway
+      VpcId: !Ref VPC
 
-            RoleName: getUrl-sample-Role
+  PublicSubnet1:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC
+      AvailabilityZone: !Select [ 0, !GetAZs '' ]
+      CidrBlock: !Ref PublicSubnet1CIDR
+      MapPublicIpOnLaunch: true
+      Tags:
+        - Key: Name
+          Value: !Sub ${EnvironmentName} Public Subnet (AZ1)
 
-    getUrlSecurityGroup:
-        Type: AWS::EC2::SecurityGroup
-        Properties:
-            GroupDescription: Security Group for GetUrl
-            GroupName: getUrl-sample
-            VpcId: !Ref getUrlVpc
-  
-    getUrlSecurityGroupIngress:
-        Type: AWS::EC2::SecurityGroupIngress
-        DependsOn: getUrlSecurityGroup
-        Properties:
-            GroupId: !GetAtt getUrlSecurityGroup.GroupId
-            IpProtocol: tcp
-            FromPort: 8111
-            ToPort: 8111
-            SourceSecurityGroupId: !GetAtt getUrlSecurityGroup.GroupId   
+  PublicSubnet2:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC
+      AvailabilityZone: !Select [ 1, !GetAZs  '' ]
+      CidrBlock: !Ref PublicSubnet2CIDR
+      MapPublicIpOnLaunch: true
+      Tags:
+        - Key: Name
+          Value: !Sub ${EnvironmentName} Public Subnet (AZ2)
 
-    getUrlVpc:
-        Type: AWS::EC2::VPC
-        Properties:
-            CidrBlock: 10.0.0.0/16
-            EnableDnsHostnames: true
-            EnableDnsSupport: true
-            InstanceTenancy: default
-            Tags:
-              - Key: Name
-                Value: getUrl-sample
-    
-    #configure subnet1
-    getUrlSubnet:
-        Type: AWS::EC2::Subnet
-        Properties:
-            AvailabilityZone:
-                Fn::Select:
-                    - 0
-                    - Fn::GetAZs: ''
-            CidrBlock: 10.0.0.0/20
-            Tags:
-                - Key: Name
-                  Value: getUrl-sample
-            VpcId: !Ref getUrlVpc
-    
-    getUrlSubnetGroup:
-        Type: AWS::DAX::SubnetGroup
-        Properties:
-            Description: Subnet group for GetUrl Sample
-            SubnetGroupName: getUrl-sample
-            SubnetIds: 
-                - !Ref getUrlSubnet            
+  PrivateSubnet1:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC
+      AvailabilityZone: !Select [ 0, !GetAZs  '' ]
+      CidrBlock: !Ref PrivateSubnet1CIDR
+      MapPublicIpOnLaunch: false
+      Tags:
+        - Key: Name
+          Value: !Sub ${EnvironmentName} Private Subnet (AZ1)
+
+  PrivateSubnet2:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC
+      AvailabilityZone: !Select [ 1, !GetAZs  '' ]
+      CidrBlock: !Ref PrivateSubnet2CIDR
+      MapPublicIpOnLaunch: false
+      Tags:
+        - Key: Name
+          Value: !Sub ${EnvironmentName} Private Subnet (AZ2)
+
+  NatGateway1EIP:
+    Type: AWS::EC2::EIP
+    DependsOn: InternetGatewayAttachment
+    Properties:
+      Domain: vpc
+
+  NatGateway2EIP:
+    Type: AWS::EC2::EIP
+    DependsOn: InternetGatewayAttachment
+    Properties:
+      Domain: vpc
+
+  NatGateway1:
+    Type: AWS::EC2::NatGateway
+    Properties:
+      AllocationId: !GetAtt NatGateway1EIP.AllocationId
+      SubnetId: !Ref PublicSubnet1
+
+  NatGateway2:
+    Type: AWS::EC2::NatGateway
+    Properties:
+      AllocationId: !GetAtt NatGateway2EIP.AllocationId
+      SubnetId: !Ref PublicSubnet2
+
+  PublicRouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref VPC
+      Tags:
+        - Key: Name
+          Value: !Sub ${EnvironmentName} Public Routes
+
+  DefaultPublicRoute:
+    Type: AWS::EC2::Route
+    DependsOn: InternetGatewayAttachment
+    Properties:
+      RouteTableId: !Ref PublicRouteTable
+      DestinationCidrBlock: 0.0.0.0/0
+      GatewayId: !Ref InternetGateway
+
+  PublicSubnet1RouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref PublicRouteTable
+      SubnetId: !Ref PublicSubnet1
+
+  PublicSubnet2RouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref PublicRouteTable
+      SubnetId: !Ref PublicSubnet2
+
+
+  PrivateRouteTable1:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref VPC
+      Tags:
+        - Key: Name
+          Value: !Sub ${EnvironmentName} Private Routes (AZ1)
+
+  DefaultPrivateRoute1:
+    Type: AWS::EC2::Route
+    Properties:
+      RouteTableId: !Ref PrivateRouteTable1
+      DestinationCidrBlock: 0.0.0.0/0
+      NatGatewayId: !Ref NatGateway1
+
+  PrivateSubnet1RouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref PrivateRouteTable1
+      SubnetId: !Ref PrivateSubnet1
+
+  PrivateRouteTable2:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref VPC
+      Tags:
+        - Key: Name
+          Value: !Sub ${EnvironmentName} Private Routes (AZ2)
+
+  DefaultPrivateRoute2:
+    Type: AWS::EC2::Route
+    Properties:
+      RouteTableId: !Ref PrivateRouteTable2
+      DestinationCidrBlock: 0.0.0.0/0
+      NatGatewayId: !Ref NatGateway2
+
+  PrivateSubnet2RouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref PrivateRouteTable2
+      SubnetId: !Ref PrivateSubnet2
+
+  NoIngressSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupName: "no-ingress-sg"
+      GroupDescription: "Security group with no ingress rule"
+      VpcId: !Ref VPC
+
+  siteFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+        Handler: car-option-retrieval.lambda_handler
+        Runtime: python3.8
+        CodeUri: ./services
+        Environment:
+            Variables:
+                REGION: ap-southeast-1
+        Events:
+            postUrl:
+                Type: Api
+                Properties:
+                    Method: post
+                    Path: /car-option-retrieval
+        Policies:
+            # - AmazonDynamoDBFullAccess
+            - AWSLambdaVPCAccessExecutionRole
+        Timeout: 10
+        VpcConfig:
+            SecurityGroupIds: 
+                - !GetAtt NoIngressSecurityGroup.GroupId
+            SubnetIds:
+                - !Ref PrivateSubnet2
+                - !Ref PrivateSubnet1
+
+#   getUrlTable:
+#     Type: AWS::DynamoDB::Table
+#     Properties:
+#         AttributeDefinitions:
+#             - 
+#                 AttributeName: id
+#                 AttributeType: S
+#         KeySchema:
+#             - 
+#                 AttributeName: id
+#                 KeyType: HASH
+#         ProvisionedThroughput:
+#             ReadCapacityUnits: 100
+#             WriteCapacityUnits: 10
+                              
+  DynamoDBEndpoint:
+    Type: AWS::EC2::VPCEndpoint
+    Properties:
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Action: "dynamodb:*"
+            Principal: "*"
+            Resource: "arn:aws:dynamodb:ap-southeast-1:322967638274:table/EvWorldCar"
+      RouteTableIds:
+        - !Ref 'PrivateRouteTable1'
+        - !Ref 'PrivateRouteTable2'
+      ServiceName: !Join [ "", [ "com.amazonaws.", { "Ref": "AWS::Region" }, ".dynamodb" ] ]
+      VpcId: !Ref 'VPC'
+
+                
+Outputs:
+  VPC:
+    Description: A reference to the created VPC
+    Value: !Ref VPC
+
+  PublicSubnets:
+    Description: A list of the public subnets
+    Value: !Join [ ",", [ !Ref PublicSubnet1, !Ref PublicSubnet2 ]]
+
+  PrivateSubnets:
+    Description: A list of the private subnets
+    Value: !Join [ ",", [ !Ref PrivateSubnet1, !Ref PrivateSubnet2 ]]
+
+  PublicSubnet1:
+    Description: A reference to the public subnet in the 1st Availability Zone
+    Value: !Ref PublicSubnet1
+
+  PublicSubnet2:
+    Description: A reference to the public subnet in the 2nd Availability Zone
+    Value: !Ref PublicSubnet2
+
+  PrivateSubnet1:
+    Description: A reference to the private subnet in the 1st Availability Zone
+    Value: !Ref PrivateSubnet1
+
+  PrivateSubnet2:
+    Description: A reference to the private subnet in the 2nd Availability Zone
+    Value: !Ref PrivateSubnet2
+
+  NoIngressSecurityGroup:
+    Description: Security group with no ingress rule
+    Value: !Ref NoIngressSecurityGroup
