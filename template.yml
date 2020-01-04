@@ -11,14 +11,14 @@ Resources:
         CodeUri: ./services
         Environment:
             Variables:
-            DAX_ENDPOINT: !GetAtt getUrlCluster.ClusterDiscoveryEndpoint
-            DDB_TABLE: !Ref getUrlTable
+                DAX_ENDPOINT: !GetAtt getUrlCluster.ClusterDiscoveryEndpoint
+                DDB_TABLE: !Ref getUrlTable
         Events:
             postUrl:
-            Type: Api
-            Properties:
-                Method: post
-                Path: /car-model-search
+                Type: Api
+                Properties:
+                    Method: post
+                    Path: /car-model-search
         Policies:
             - AmazonDynamoDBFullAccess
             - AWSLambdaVPCAccessExecutionRole
