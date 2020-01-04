@@ -97,6 +97,9 @@ Resources:
             MemorySize: 128
             Timeout: 30
             Role: !GetAtt LambdaExecutionRole.Arn
+            Policies:
+                - DynamoDBCrudPolicy:
+                  TableName: !Ref Table
             Events:
                 getCarOptionsAPI:
                     Type: Api
@@ -105,4 +108,8 @@ Resources:
                         Method: post
             Environment:
                 Variables:
+                    TABLE_NAME: !Ref Table
                     REGION: ap-southeast-1
+
+    Table:
+        Type: AWS::Serverless::SimpleTable               
