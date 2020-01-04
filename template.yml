@@ -14,6 +14,11 @@ Resources:
                 DAX_ENDPOINT: !GetAtt getUrlCluster.ClusterDiscoveryEndpoint
                 DDB_TABLE: !Ref getUrlTable
         Events:
+            getUrl:
+                Type: Api
+                Properties:
+                    Method: get
+                    Path: /{id+}
             postUrl:
                 Type: Api
                 Properties:
