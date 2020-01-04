@@ -213,35 +213,20 @@ Resources:
       Environment:
         Variables:
           REGION: ap-southeast-1
-        Events:
-          postUrl:
-            Type: Api
-            Properties:
-              Method: post
-              Path: /car-model-search
-        Policies:
-          - AWSLambdaVPCAccessExecutionRole
-        Timeout: 10
-        VpcConfig:
-          SecurityGroupIds: 
-            - !GetAtt NoIngressSecurityGroup.GroupId
-          SubnetIds:
-            - !Ref PrivateSubnet2
-
-#   getUrlTable:
-#     Type: AWS::DynamoDB::Table
-#     Properties:
-#         AttributeDefinitions:
-#             - 
-#                 AttributeName: id
-#                 AttributeType: S
-#         KeySchema:
-#             - 
-#                 AttributeName: id
-#                 KeyType: HASH
-#         ProvisionedThroughput:
-#             ReadCapacityUnits: 100
-#             WriteCapacityUnits: 10
+      Events:
+        postUrl:
+          Type: Api
+          Properties:
+            Method: post
+            Path: /car-model-search
+      Policies:
+        - AWSLambdaVPCAccessExecutionRole
+      Timeout: 10
+      VpcConfig:
+        SecurityGroupIds: 
+          - !GetAtt NoIngressSecurityGroup.GroupId
+        SubnetIds:
+          - !Ref PrivateSubnet2
                               
   DynamoDBEndpoint:
     Type: AWS::EC2::VPCEndpoint
