@@ -204,7 +204,7 @@ Resources:
       GroupDescription: "Security group with no ingress rule"
       VpcId: !Ref VPC
 
-  siteFunction:
+  SampleLambda:
     Type: AWS::Serverless::Function
     Properties:
         Handler: car-option-retrieval.lambda_handler
