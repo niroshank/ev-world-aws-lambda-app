@@ -1,115 +1,123 @@
-#SAM Template - defines the application
-#AWS SAM is a model used to define serverless applications on AWS
 AWSTemplateFormatVersion: '2010-09-09'
+Description: A sample application showing how to use Amazon DynamoDB Accelerator (DAX) with AWS Lambda and AWS CloudFormation.
 Transform: AWS::Serverless-2016-10-31
 
-Description:
-  Creates a RESTful API using API Gateway, Lambda and DynamoDB for the ev world development team
-
 Resources:
-     #Defining a role for lambda functions
-    LambdaExecutionRole:
-        Description: Creating service role in IAM for AWS Lambda
+    siteFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+        Handler: car-model-search.lambda_handler
+        Runtime: python3.8
+        CodeUri: ./services
+        Environment:
+            Variables:
+            DAX_ENDPOINT: !GetAtt getUrlCluster.ClusterDiscoveryEndpoint
+            DDB_TABLE: !Ref getUrlTable
+        Events:
+            postUrl:
+            Type: Api
+            Properties:
+                Method: post
+                Path: /car-model-search
+        Policies:
+            - AmazonDynamoDBFullAccess
+            - AWSLambdaVPCAccessExecutionRole
+        Timeout: 10
+        VpcConfig:
+            SecurityGroupIds: 
+                - !GetAtt getUrlSecurityGroup.GroupId
+            SubnetIds:
+                - !Ref getUrlSubnet
+
+    getUrlTable:
+        Type: AWS::DynamoDB::Table
+        Properties:
+        TableName: GetUrl-sample
+        AttributeDefinitions:
+            - 
+            AttributeName: id
+            AttributeType: S
+        KeySchema:
+            - 
+            AttributeName: id
+            KeyType: HASH
+        ProvisionedThroughput:
+            ReadCapacityUnits: 100
+            WriteCapacityUnits: 10
+
+    getUrlCluster:
+        Type: AWS::DAX::Cluster
+        Properties:
+            ClusterName: getUrl-sample
+            Description: Cluster for GetUrl Sample
+            IAMRoleARN: !GetAtt getUrlRole.Arn
+            NodeType: dax.t2.small
+            ReplicationFactor: 1
+            SecurityGroupIds:
+                - !GetAtt getUrlSecurityGroup.GroupId
+            SubnetGroupName: !Ref getUrlSubnetGroup
+
+    getUrlRole:
         Type: AWS::IAM::Role
         Properties:
-            AssumeRolePolicyDocument:
-                Statement:
-                - Effect: Allow
-                  Principal:
-                    Service: [lambda.amazonaws.com]
-                  Action: sts:AssumeRole
-            Path: /
-            ManagedPolicyArns:
-                -  arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
-                -  arn:aws:iam::aws:policy/AmazonDynamoDBFullAccess
+        AssumeRolePolicyDocument:
+            Statement:
+            - Action:
+                - sts:AssumeRole
+                Effect: Allow
+                Principal:
+                    Service:
+                    - dax.amazonaws.com
+            Version: '2012-10-17'
+        ManagedPolicyArns:
+            - arn:aws:iam::aws:policy/AmazonDynamoDBFullAccess
+        RoleName: getUrl-sample-Role
 
-    #Defining the lambda function for testing
-    CDDemoLambda:
-        Type: AWS::Serverless::Function
+    getUrlSecurityGroup:
+        Type: AWS::EC2::SecurityGroup
         Properties:
-            Handler: lambdaFunction.lambda_handler
-            Runtime: python3.8
-            CodeUri: ./services
-            Description: 'Lambda function for CD Demo'
-            MemorySize: 128
-            Timeout: 30
-            Role: !GetAtt LambdaExecutionRole.Arn
-            Events:
-                getAZsAPI:
-                    Type: Api
-                    Properties:
-                        Path: /getazs
-                        Method: get
-            Environment:
-                Variables:
-                    REGION: ap-southeast-1
+            GroupDescription: Security Group for GetUrl
+            GroupName: getUrl-sample
+            VpcId: !Ref getUrlVpc
+  
+    getUrlSecurityGroupIngress:
+        Type: AWS::EC2::SecurityGroupIngress
+        DependsOn: getUrlSecurityGroup
+        Properties:
+            GroupId: !GetAtt getUrlSecurityGroup.GroupId
+            IpProtocol: tcp
+            FromPort: 8111
+            ToPort: 8111
+            SourceSecurityGroupId: !GetAtt getUrlSecurityGroup.GroupId   
+
+    getUrlVpc:
+            Type: AWS::EC2::VPC
+            Properties:
+            CidrBlock: 10.0.0.0/16
+            EnableDnsHostnames: true
+            EnableDnsSupport: true
+            InstanceTenancy: default
+            Tags:
+                - Key: Name
+                Value: getUrl-sample
     
-    #search model lambda function
-    ModelSearchLambda:
-        Type: AWS::Serverless::Function
+    getUrlSubnet:
+        Type: AWS::EC2::Subnet
         Properties:
-            Handler: car-model-search.lambda_handler
-            Runtime: python3.8
-            CodeUri: ./services
-            Description: 'Lambda function for car model search'
-            MemorySize: 128
-            Timeout: 30
-            Role: !GetAtt LambdaExecutionRole.Arn
-            Events:
-                scanCarModelAPI:
-                    Type: Api
-                    Properties:
-                        Path: /car-model-search
-                        Method: post
-            Environment:
-                Variables:
-                    REGION: ap-southeast-1
+            AvailabilityZone:
+                Fn::Select:
+                - 0
+                - Fn::GetAZs: ''
+            CidrBlock: 10.0.0.0/20
+            Tags:
+                - Key: Name
+                Value: getUrl-sample
+            VpcId: !Ref getUrlVpc
     
-    #retrieve price lambda function
-    PriceRetrievalLambda:
-        Type: AWS::Serverless::Function
+    getUrlSubnetGroup:
+        Type: AWS::DAX::SubnetGroup
         Properties:
-            Handler: car-price-retrieval.lambda_handler
-            Runtime: python3.8
-            CodeUri: ./services
-            Description: 'Lambda function for car price retrieve'
-            MemorySize: 128
-            Timeout: 30
-            Role: !GetAtt LambdaExecutionRole.Arn
-            Events:
-                getCarPriceAPI:
-                    Type: Api
-                    Properties:
-                        Path: /car-price
-                        Method: post
-            Environment:
-                Variables:
-                    REGION: ap-southeast-1                
-
-    #retrieve options lambda function
-    OptionsRetrievalLambda:
-        Type: AWS::Serverless::Function
-        Properties:
-            Handler: car-option-retrieval.lambda_handler
-            Runtime: python3.8
-            CodeUri: ./services
-            Description: 'Lambda function for car options retrieve'
-            MemorySize: 128
-            Timeout: 30
-            Role: !GetAtt LambdaExecutionRole.Arn
-            Policies:
-                - DynamoDBCrudPolicy:
-                  TableName: !Ref Table
-            Events:
-                getCarOptionsAPI:
-                    Type: Api
-                    Properties:
-                        Path: /car-options
-                        Method: post
-            Environment:
-                Variables:
-                    TABLE_NAME: !Ref Table
-                    REGION: ap-southeast-1
-
-    Table:
-        Type: AWS::Serverless::SimpleTable               
+            Description: Subnet group for GetUrl Sample
+            SubnetGroupName: getUrl-sample
+            SubnetIds: 
+                - !Ref getUrlSubnet            
