@@ -2,16 +2,10 @@ version: 0.2
 phases:
   install:
     runtime-versions:
-      python: 3.8
-  pre_build:
-    commands:
-      - python --version
-      # - pip install virtualenv
-      # - virtualenv .venv
-      # - . .venv/bin/activate
-      - pip install amazon-dax-client 
+      python: 3.8   
   build:
     commands:
+      - python --version
       - aws cloudformation package --template-file template.yml --s3-bucket ev-world-aws-lambda-bucket --output-template-file outputtemplate.yml
 artifacts:
   type: zip
