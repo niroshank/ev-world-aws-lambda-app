@@ -67,7 +67,7 @@ Resources:
            Type: Api
            Properties:
              Path: /getazs
-             Method: get
+             Method: post
       Environment:
         Variables:
           REGION: ap-southeast-1
