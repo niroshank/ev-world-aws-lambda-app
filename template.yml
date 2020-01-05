@@ -32,4 +32,19 @@ Resources:
           - subnet-0179c1a5c22cb282b
           - subnet-0cc5cb36ca0766b95
 
+  LambdaExecutionRole:
+    Description: Creating service role in IAM for AWS Lambda
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+        - Effect: Allow
+          Principal:
+            Service: [lambda.amazonaws.com]
+          Action: sts:AssumeRole
+      Path: /
+      ManagedPolicyArns:
+        -  arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+        # -  arn:aws:iam::aws:policy/AmazonDynamoDBFullAccess          
+
             
