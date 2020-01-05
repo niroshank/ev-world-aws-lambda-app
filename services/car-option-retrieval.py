@@ -5,7 +5,7 @@ from boto3.dynamodb.conditions import Key, Attr
 from decimal import Decimal
 
 ddb = boto3.resource('dynamodb')
-table = ddb.Table(os.environ['EvWorldCar'])
+table = ddb.Table(os.environ['DDB'])
 
 def lambda_handler(event, context):
     dataObject = json.loads(event['body'])

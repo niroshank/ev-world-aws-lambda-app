@@ -224,6 +224,19 @@ Resources:
         -  !Ref RouteTableBPrivate
       ServiceName: !Sub 'com.amazonaws.${AWS::Region}.dynamodb'
       VpcId: !Ref VPC
+      PolicyDocument:
+        Id: Policy
+        Version: '2012-10-17'
+        Statement:
+          -
+            Sid: DyanmoDBAccess
+            Effect: Allow
+            Principal: 
+            Action:
+              - dynamodb:*
+            Resource: !GetAtt
+                  - DynamoDBTable
+                  - Arn
       PolicyDocument: {
         "Id": "Policy",
         "Version": "2012-10-17",
