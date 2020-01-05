@@ -268,7 +268,7 @@ Resources:
       Policies:
         - PolicyName: LambdaDyanmoDBPolicy
           PolicyDocument:
-            Version: '2012-10-17'
+            Version: 2012-10-17
             Statement:
               - Action:
                   - "dynamodb:*"
@@ -298,9 +298,7 @@ Resources:
                     DDB: DynamoDBTable
       VpcConfig:
         SecurityGroupIds: 
-          - !Ref VPC
+          - !GetAtt VPC.DefaultSecurityGroup
         SubnetIds:
           - !Ref SubnetAPrivate
-          - !Ref SubnetBPrivate        
-
-        
+          - !Ref SubnetBPrivate
