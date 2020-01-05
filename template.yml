@@ -316,3 +316,55 @@ Resources:
         SubnetIds:
           - !Ref SubnetAPrivate
           - !Ref SubnetBPrivate
+  ModelSearchLambda:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: car-model-search.lambda_handler
+      Runtime: python3.8
+      CodeUri: ./services
+      Description: 'Lambda function for model search'
+      MemorySize: 128
+      Timeout: 30
+      Role: !GetAtt LambdaExecutionRole.Arn
+      Events:
+        getCarModelAPI:
+          Type: Api
+          Properties:
+            Path: /car-model-search
+            Method: post       
+      Environment:
+                Variables:
+                    REGION: ap-southeast-1  
+                    DDB: DynamoDBTable
+      VpcConfig:
+        SecurityGroupIds: 
+          - !GetAtt VPC.DefaultSecurityGroup
+        SubnetIds:
+          - !Ref SubnetAPrivate
+          - !Ref SubnetBPrivate          
+  OptionsRetrievalLambda:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: car-option-retrieval.lambda_handler
+      Runtime: python3.8
+      CodeUri: ./services
+      Description: 'Lambda function for option retrieval'
+      MemorySize: 128
+      Timeout: 30
+      Role: !GetAtt LambdaExecutionRole.Arn
+      Events:
+        getCarOptionsAPI:
+          Type: Api
+          Properties:
+            Path: /car-option-retrieval
+            Method: post       
+      Environment:
+                Variables:
+                    REGION: ap-southeast-1  
+                    DDB: DynamoDBTable
+      VpcConfig:
+        SecurityGroupIds: 
+          - !GetAtt VPC.DefaultSecurityGroup
+        SubnetIds:
+          - !Ref SubnetAPrivate
+          - !Ref SubnetBPrivate             
