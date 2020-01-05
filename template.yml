@@ -4,7 +4,7 @@ Description:  This template deploys a VPC, with a pair of public and private sub
   across two Availability Zones. It deploys an internet gateway, with a default
   route on the public subnets. It deploys a pair of NAT gateways (one in each AZ),
   and default routes for them in the private subnets. It deploys endpoint for dynamodb.
-  It deploys lambda function with IAM role and can be access from created api
+  It deploys lambda function with IAM role and can be access from created api.
 
 Parameters:
   ClassB:
@@ -240,7 +240,7 @@ Resources:
   DynamoDBTable:
     Type: AWS::DynamoDB::Table
     Properties:
-      TableName: GetUrl-sample
+      TableName: DynamoDBTable
       AttributeDefinitions:
         - 
            AttributeName: id
