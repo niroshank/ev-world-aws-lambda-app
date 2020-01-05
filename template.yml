@@ -17,8 +17,6 @@ Resources:
       Timeout: 30
       Role: !GetAtt LambdaExecutionRole.Arn
       Events:
-      Policies:
-        - AWSLambdaVPCAccessExecutionRole  
         getAZsAPI:
            Type: Api
            Properties:
@@ -33,6 +31,8 @@ Resources:
         SubnetIds:
           - subnet-0179c1a5c22cb282b
           - subnet-0cc5cb36ca0766b95
+      Policies:
+        - AWSLambdaVPCAccessExecutionRole    
 
   LambdaExecutionRole:
     Description: Creating service role in IAM for AWS Lambda
