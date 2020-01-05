@@ -17,6 +17,9 @@ Resources:
       Timeout: 30
       Role: !GetAtt LambdaExecutionRole.Arn
       Events:
+      Policies:
+        - AmazonDynamoDBFullAccess
+        - AWSLambdaVPCAccessExecutionRole  
         getAZsAPI:
            Type: Api
            Properties:
@@ -44,7 +47,7 @@ Resources:
           Action: sts:AssumeRole
       Path: /
       ManagedPolicyArns:
-        -  arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
         # -  arn:aws:iam::aws:policy/AmazonDynamoDBFullAccess          
 
             
