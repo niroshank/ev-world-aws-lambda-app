@@ -30,9 +30,7 @@ Resources:
           - sg-0411558d8a47b0442
         SubnetIds:
           - subnet-0179c1a5c22cb282b
-          - subnet-0cc5cb36ca0766b95
-      Policies:
-        - AWSLambdaVPCAccessExecutionRole    
+          - subnet-0cc5cb36ca0766b95  
 
   LambdaExecutionRole:
     Description: Creating service role in IAM for AWS Lambda
@@ -47,6 +45,6 @@ Resources:
       Path: /
       ManagedPolicyArns:
         - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
-        # -  arn:aws:iam::aws:policy/AmazonDynamoDBFullAccess          
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole        
 
             
