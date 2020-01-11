@@ -55,7 +55,7 @@ Resources:
         getCarPriceAPI:
           Type: Api
           Properties:
-            Path: /car-price
+            Path: /car-price-retrieval
             Method: post       
       Environment:
                 Variables:
