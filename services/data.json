@@ -1,5 +1,5 @@
 {
-  "id": "$id",
+  "id": "1",
   "payload": {
     "make": "Toyota",
     "model": "Camry",
@@ -14,8 +14,6 @@
       "cooling_system": "Air"
     },
     "created_date": "2019-01-18T00:00:00Z",
-    "updated_date": "2019-01-18T00:00:00Z",
-    "url": "https://github.com/andrejmaya/aws-sam-examples",
-    "url2": "https://github.com/awslabs/aws-sam-cli-app-templates/tree/master/python3.6/cookiecutter-aws-sam-hello-python/%7B%7Bcookiecutter.project_name%7D%7D"
+    "updated_date": "2019-01-18T00:00:00Z"
   }
 }
